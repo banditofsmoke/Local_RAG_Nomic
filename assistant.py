@@ -188,5 +188,3 @@ while True:
         convo.append({'role': 'user', 'content': prompt})
         stream_response(prompt=prompt)
 
-
-T
