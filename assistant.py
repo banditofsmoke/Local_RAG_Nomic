@@ -182,7 +182,7 @@ while True:
     elif prompt[:9].lower() == '/memorize':
         prompt = prompt [10:]
         store_conversations(prompt=prompt, response='Memory stored.')
-        print('/n')
+        print('\n')
 
     else:
         convo.append({'role': 'user', 'content': prompt})
