@@ -39,23 +39,33 @@ def fetch_conversations():
     return conversations
 
 def store_conversations(prompt, response):
-    conn = connect_db()
-    with conn.cursor() as cursor:
-        cursor.execute(
-    'INSERT INTO conversations (timestamp, prompt, response) VALUES (CURRENT_TIMESTAMP, %s, %s)',
-    (prompt, response)
-)
-        conn.commit()
-    conn.close()
+    try:
+        conn = connect_db()
+        with conn.cursor() as cursor:
+            cursor.execute(
+                'INSERT INTO conversations (timestamp, prompt, response) VALUES (CURRENT_TIMESTAMP, %s, %s)',
+                (prompt, response)
+            )
+            conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Error storing conversation: {e}")
+        return False
 
 def remove_last_conversation():
     conn = connect_db()
-    with conn.cursor() as cursor:
-        cursor.execute('DELETE FROM conversations WHERE id = (SELECT MAX(id) FROM conversations)')
-        cursor.commit()
-    conn.close()  
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute('DELETE FROM conversations WHERE id = (SELECT MAX(id) FROM conversations)')
+        conn.commit()  # Move this line outside of the 'with' block
+        print(Fore.YELLOW + "\nLast conversation removed successfully.\n")
+    except Exception as e:
+        print(Fore.RED + f"\nError removing last conversation: {e}\n")
+    finally:
+        conn.close()  
 
-def stream_response(prompt):
+def stream_response(prompt, store=False):
     response = ''
     stream = ollama.chat(model='phi3', messages=convo, stream=True)
     print(Fore.LIGHTGREEN_EX + '\nASSISTANT:')
@@ -66,7 +76,10 @@ def stream_response(prompt):
         print(content, end='', flush=True)
 
     print('\n')
-    store_conversations(prompt=prompt, response=response)
+    
+    if store:
+        store_conversations(prompt=prompt, response=response)
+    
     convo.append({'role': 'assistant','content':response})
 
 def create_vector_db(conversations):
@@ -171,20 +184,24 @@ create_vector_db(conversations=conversations)
 while True:
     prompt = input(Fore.WHITE + 'USER: \n')
     
-    if prompt[:7].lower() == '/recall':
-        prompt = prompt [8:]
+    if prompt.lower().startswith('/recall'):
+        prompt = prompt[7:].strip()
         recall(prompt=prompt)
-        stream_response(prompt=prompt)
-    elif prompt[:7].lower == '/forget':
+        stream_response(prompt=prompt, store=False)
+    elif prompt.lower().startswith('/forget'):
         remove_last_conversation()
-        convo = convo[:-2]
-        print ('\n')
-    elif prompt[:9].lower() == '/memorize':
-        prompt = prompt [10:]
-        store_conversations(prompt=prompt, response='Memory stored.')
-        print('\n')
-
+        if len(convo) >= 2:
+            convo = convo[:-2]  # Remove the last user input and assistant response from the conversation history
+        print(Fore.YELLOW + '\nLast conversation forgotten.\n')
+    elif prompt.lower().startswith('/memorize'):
+        memory_content = prompt[9:].strip()
+        if store_conversations(prompt=memory_content, response='Memory stored.'):
+            print(Fore.YELLOW + '\nMemory stored successfully.\n')
+            convo.append({'role': 'user', 'content': f"Remember this: {memory_content}"})
+            convo.append({'role': 'assistant', 'content': "I've remembered that information."})
+        else:
+            print(Fore.RED + '\nFailed to store memory.\n')
     else:
         convo.append({'role': 'user', 'content': prompt})
-        stream_response(prompt=prompt)
+        stream_response(prompt=prompt, store=True)
 
