@@ -21,7 +21,7 @@ convo = [{'role': 'system', 'content': system_prompt}]
 DB_PARAMS ={
     'dbname': 'memory_agent',
     'user': 'postgres',
-    'password': 'datARsec6',
+    'password': 'admin',
     'host': 'localhost',
     'port': '5432'
 }
@@ -161,7 +161,7 @@ def classify_embedding(query, context):
 )
     classify_convo = [
         {'role': 'system', 'content': classify_msg},
-        {'role': 'user', 'content':f'SEARCH QUERY: What is the users name? \n\nEMBEDDED CONTEXT: You are Wayne. How can I help you today Wayne?'},
+        {'role': 'user', 'content':f'SEARCH QUERY: What is the users name? \n\nEMBEDDED CONTEXT: You are [NAME]. How can I help you today [NAME]?'},
         {'role': 'user', 'content': 'yes'},
         {'role': 'user', 'content': f'SEARCH QUERY: Llama3 Python Voice Assistant \n\nEMBEDDED CONTEXT: Siri is a voice assistant on Apple iOS and Mac OS'},
         {'role': 'user', 'content': 'no'},
