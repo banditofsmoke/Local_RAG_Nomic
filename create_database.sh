@@ -1,0 +1,1 @@
+sudo -u postgres psql -d memory_agent -a -f database.sql 
