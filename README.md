@@ -1,3 +1,13 @@
+<p align="center">
+  <a href="https://ko-fi.com/waynesletcher"><img src="doc/buy me a coffee button.png" height="48"></a>
+</p>
+
+LinkedIn: [Wayne Sletcher](https://www.linkedin.com/in/waynesletcheraisystemsbuilder)
+Email: skeletonenglish@gmail.com
+GitHub: [banditofsmoke](https://github.com/banditofsmoke)
+
+Made in Sledge's Forge (Private Discord)
+
 # 🚀 Local RAG Assistant: Your Tiny Open-Source RAG Revolution! 🧠💬
 
 Welcome to the Local RAG Assistant project - where big AI meets small hardware! This nifty little system brings the power of Retrieval-Augmented Generation (RAG) right to your local machine, no cloud required. Whether you're rockin' a beefy rig or a trusty old laptop, we've got you covered!
